@@ -63,7 +63,11 @@ t0=Screen('Flip', window);
              tic;
  %%% T=6  10hz
              while (toc<=0.044&&KeyIsDown(i)==0&&i>=2&&KeyIsDown(i-1)==0)%key board check for 60ms 
-                 [KeyIsDown(i),KeySecs(i)]=KbCheck;
+                 [KeyIsDown(i),KeySecs(i), zcc_keyCode]=KbCheck;
+                 % escape, when esc is down.
+                 if strcmp('esc', KbName(find(zcc_keyCode)))
+                     Screen('Close')
+                 end
                  if (KeyIsDown(i) == 1)
                      WaitSecs(0.01);
                      outp(hex2dec(para_id),3);

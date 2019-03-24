@@ -1,5 +1,6 @@
 clear all
 path='C:\Download\DataSet\tainda_new';
+path = pwd
 cd(path)
 % info about distractors & target
 % ctg:names of sti mulus image categories
@@ -117,7 +118,7 @@ for block=1:blk_num
     tgt_loc_temp(temp_i)=[]; %% 丢失目标位置
     
     a=tgt_loc_temp;
-    if (length(a)>0 && (length(a)<tgt_num+1))
+    if (~isempty(a) && (length(a)<tgt_num+1))
         msg=sprintf('You have missed %1d target! Press any key to check out.',length(a));
     else if (length(a)<1)
             msg=sprintf('Wonderful! No target missed! Press any key to continue.');
@@ -129,20 +130,50 @@ for block=1:blk_num
     Screen(window,'Flip');
     WaitSecs(0.3);
      KbWait    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if (length(a)>0 )
-        for  j=1:length(a)
+    if (~isempty(a) )
+        % display missing pictures in one grid
+        zcc_nc = 2;
+        zcc_j = 0;
+        zcc_d = 10;
+        clear zcc_im_mtx
+        for j = 1 : length(a)
+            zcc_j = zcc_j + 1;
             addr=sprintf('images/%s/image_%04d.jpg',char(ctg(ctg_n(a(j)))),Id(a(j)));  %% 反找到丢失图片，再呈现，哪一类第几个
             im_mtx=imread(addr);
-            index=Screen(window,'MakeTexture',im_mtx);
-            tRect=Screen('Rect', index);
-            %                 ctRect=CenterRect(1.5*tRect, windowRect);
-            ctRect=[windowRect(3)/2-250,windowRect(4)/2-250,windowRect(3)/2+250,windowRect(4)/2+250];
-            Screen(window,'DrawTexture',index,tRect,ctRect);
-            Screen('Flip', window);
-            WaitSecs(0.8);  %原始0.3
-            %             KbWait %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            im_mtx(end+1:end+zcc_d, :, :) = 255;
+            im_mtx(:, end+1:end+zcc_d, :) = 255;
+            zcc_sz = size(im_mtx);
+            zcc_c = mod(zcc_j-1, zcc_nc) + 1;
+            zcc_r = ceil(zcc_j / zcc_nc);
+            zcc_im_mtx((zcc_r-1)*(zcc_sz(1))+[1:zcc_sz(1)], (zcc_c-1)*(zcc_sz(2))+[1:zcc_sz(2)], :) = im_mtx;
         end
-    end 
+        while zcc_j < 4
+            zcc_j = zcc_j + 1;
+            im_mtx = im_mtx*0 + 255;
+            zcc_c = mod(zcc_j-1, zcc_nc) + 1;
+            zcc_r = ceil(zcc_j / zcc_nc);
+            zcc_im_mtx((zcc_r-1)*(zcc_sz(1))+[1:zcc_sz(1)], (zcc_c-1)*(zcc_sz(2))+[1:zcc_sz(2)], :) = im_mtx;
+        end
+        index=Screen(window,'MakeTexture',zcc_im_mtx);
+        tRect=Screen('Rect', index);
+        ctRect=[windowRect(3)/2-250,windowRect(4)/2-250,windowRect(3)/2+250,windowRect(4)/2+250];
+        Screen(window,'DrawTexture',index,tRect,ctRect);
+        Screen('Flip', window);
+        WaitSecs(0.8)
+        KbWait
+%         for  j=1:length(a)
+%             addr=sprintf('images/%s/image_%04d.jpg',char(ctg(ctg_n(a(j)))),Id(a(j)));  %% 反找到丢失图片，再呈现，哪一类第几个
+%             im_mtx=imread(addr);
+%             index=Screen(window,'MakeTexture',im_mtx);
+%             tRect=Screen('Rect', index);
+%             %                 ctRect=CenterRect(1.5*tRect, windowRect);
+%             ctRect=[windowRect(3)/2-250,windowRect(4)/2-250,windowRect(3)/2+250,windowRect(4)/2+250];
+%             Screen(window,'DrawTexture',index,tRect,ctRect);
+%             Screen('Flip', window);
+%             WaitSecs(0.8);  %原始0.3
+%             %             KbWait %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%         end
+    end
     %%
     mkdir(strcat(ShowSubjectInfo{1,1},ShowSubjectInfo{2,1}));
     cd(strcat(ShowSubjectInfo{1,1},ShowSubjectInfo{2,1}))
