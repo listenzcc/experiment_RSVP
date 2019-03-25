@@ -1,10 +1,10 @@
 clear all
-path='C:\Download\DataSet\tainda_new';
-path = pwd
+% path='C:\Download\DataSet\tainda_new';
+path = pwd;
 cd(path)
 % info about distractors & target
-% ctg:names of sti mulus image categories
-% ctg_size:sizes o f       stimulus image categories
+% ctg:names of stimulus image categories
+% ctg_size:sizes of stimulus image categories
 % N:number of images in a single block
 format long
 global ctg;global ctg_size;global N; global T; 
@@ -22,7 +22,7 @@ blk_num=14;
 prompt = {'Name','Test time'};
 dlg_title = 'Information';
 num_lines = 1;
-defautanswer = {'',''};
+defautanswer = {'', datestr(now, '-yyyy-mmmm-dd-HH-MM-SS')};
 ShowSubjectInfo = inputdlg(prompt,dlg_title,num_lines,defautanswer,'on');
 
 %% xls write Preparation
